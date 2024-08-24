@@ -1,0 +1,268 @@
+# Default config for sway is /etc/sway/config
+# Read `man 5 sway` for a complete reference.
+
+### Variables
+#
+# Logo key. Use Mod1 for Alt.
+set $mod Mod4
+# Home row direction keys, like vim
+set $left h
+set $down j
+set $up k
+set $right l
+# Your preferred terminal emulator
+set $term foot
+
+include /etc/sway/config-vars.d/*
+
+### Output configuration
+#
+# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
+output * bg /home/ring_r/Pictures/Firefox_wallpaper.png fill
+#
+# Example configuration:
+#
+#   output HDMI-A-1 resolution 1920x1080 position 1920,0
+#
+# You can get the names of your outputs by running: swaymsg -t get_outputs
+
+### Idle configuration
+#
+# Example configuration:
+#
+# exec swayidle -w \
+#          timeout 300 'swaylock -f -c 000000' \
+#          timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+#          before-sleep 'swaylock -f -c 000000'
+#
+# This will lock your screen after 300 seconds of inactivity, then turn off
+# your displays after another 300 seconds, and turn your screens back on when
+# resumed. It will also lock your screen before your computer goes to sleep.
+
+### Input configuration
+#
+input * {
+#    xkb_file <file_name>
+}
+input type:keyboard {
+    xkb_layout us,ru,ua
+    # xkb_options grp:win_space_toggle  # it is controlled by using bindsym to update status bar or make notification
+}
+input type:pointer {
+    accel_profile flat
+    pointer_accel -0.5
+}
+input type:touchpad {
+    natural_scroll enabled
+    tap enabled
+}
+#
+# You can get the names of your inputs by running: swaymsg -t get_inputs
+# Read `man 5 sway-input` for more information about this section.
+
+#
+# Hide mouse cursor after a period of inactivity.
+#
+seat seat0 hide_cursor 3000
+
+### Key bindings
+#
+# Basics:
+#
+    # Start a terminal
+    bindsym $mod+Return exec $term
+
+    # Kill focused window
+    bindsym --to-code $mod+Shift+q kill
+
+    # Start your application launcher
+    bindsym --to-code $mod+d exec $term -a launcher -e sway-launcher-desktop
+    # for_window [app_id="^launcher$"] floating enable, sticky enable, resize set 30 ppt 60 ppt, border pixel 10
+
+    # Drag floating windows by holding down $mod and left mouse button.
+    # Resize them with right mouse button + $mod.
+    # Despite the name, also works for non-floating windows.
+    # Change normal to inverse to use left mouse button for resizing and right
+    # mouse button for dragging.
+    floating_modifier $mod normal
+
+    # Reload the configuration file
+    bindsym --to-code $mod+Shift+c reload
+
+    # Exit sway (logs you out of your Wayland session)
+    bindsym --to-code $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+#
+# Additional
+#
+    # Keyboard layout indicator
+    bindsym $mod+space exec bash -c "swaymsg input "type:keyboard" xkb_switch_layout next && pkill -SIGRTMIN+13 i3blocks"
+
+    # Start window switcher
+    # TODO: quick solution. it is not good as I want. I don't have so much windows to be this useful.
+    # bindsym $mod+Tab exec sway-tree-switcher
+    # for_window [app_id="^sway-windows-switcher$"] floating enable, sticky enable, resize set 90 ppt 30 ppt, border pixel 10
+#
+# Moving around:
+#
+    # Move your focus around
+    bindsym --to-code $mod+$left focus left
+    bindsym --to-code $mod+$down focus down
+    bindsym --to-code $mod+$up focus up
+    bindsym --to-code $mod+$right focus right
+    # Or use $mod+[up|down|left|right]
+    bindsym $mod+Left focus left
+    bindsym $mod+Down focus down
+    bindsym $mod+Up focus up
+    bindsym $mod+Right focus right
+
+    # Move the focused window with the same, but add Shift
+    bindsym --to-code $mod+Shift+$left move left
+    bindsym --to-code $mod+Shift+$down move down
+    bindsym --to-code $mod+Shift+$up move up
+    bindsym --to-code $mod+Shift+$right move right
+    # Ditto, with arrow keys
+    bindsym $mod+Shift+Left move left
+    bindsym $mod+Shift+Down move down
+    bindsym $mod+Shift+Up move up
+    bindsym $mod+Shift+Right move right
+#
+# Layout stuff:
+#
+    # You can "split" the current object of your focus with
+    # $mod+b or $mod+v, for horizontal and vertical splits
+    # respectively.
+    bindsym --to-code $mod+b splith
+    bindsym --to-code $mod+v splitv
+
+    # Switch the current container between different layout styles
+    # bindsym --to-code $mod+s layout stacking  # I don't when I should use this.
+    bindsym --to-code $mod+w layout tabbed
+    bindsym --to-code $mod+e layout toggle split
+
+    # Make the current focus fullscreen
+    bindsym --to-code $mod+f fullscreen
+
+    # Toggle the current focus between tiling and floating mode
+    bindsym $mod+Shift+space floating toggle
+
+    # Swap focus between the tiling area and the floating area
+    # bindsym $mod+space focus mode_toggle  # TODO: conflict with keyboard layour switcher; fix
+
+    # Move focus to the parent container
+    bindsym --to-code $mod+a focus parent
+#
+# Scratchpad:
+#
+    # Sway has a "scratchpad", which is a bag of holding for windows.
+    # You can send windows there and get them back later.
+
+    # Move the currently focused window to the scratchpad
+    bindsym $mod+Shift+minus move scratchpad
+
+    # Show the next scratchpad window or hide the focused scratchpad window.
+    # If there are multiple scratchpad windows, this command cycles through them.
+    bindsym $mod+minus scratchpad show
+#
+# Resizing containers:
+#
+    bindsym --to-code $mod+r mode "resize"
+    mode "resize" {
+        # left will shrink the containers width
+        # right will grow the containers width
+        # up will shrink the containers height
+        # down will grow the containers height
+        bindsym --to-code $left resize shrink width 10px
+        bindsym --to-code $down resize grow height 10px
+        bindsym --to-code $up resize shrink height 10px
+        bindsym --to-code $right resize grow width 10px
+
+        # Ditto, with arrow keys
+        bindsym Left resize shrink width 10px
+        bindsym Down resize grow height 10px
+        bindsym Up resize shrink height 10px
+        bindsym Right resize grow width 10px
+
+        # Return to default mode
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+    }
+
+#
+# Status Bar:
+#
+# Read `man 5 sway-bar` for more information about this section.
+    bar {
+        font monospace 14
+        mode overlay
+        position top
+        status_command i3blocks
+        workspace_buttons no
+
+        tray_output none
+
+        colors {
+            background #00000000
+            statusline #ffffff
+            separator #c8c8c8
+        }
+    }
+
+include /etc/sway/config.d/*
+
+#
+# Sound volume
+#
+# https://wiki.gentoo.org/wiki/Sway#Sound_volume
+    bindsym XF86AudioLowerVolume exec amixer_.sh master_decrease
+    # bind $mod+bracketleft
+    bindcode $mod+34 exec amixer_.sh master_decrease
+    bindsym XF86AudioRaiseVolume exec amixer_.sh master_increase
+    # bind $mod+bracketrigt
+    bindcode $mod+35 exec amixer_.sh master_increase
+    bindsym XF86AudioMute exec amixer_.sh master_toggle
+    bindsym XF86AudioMicMute exec amixer_.sh capture_toggle
+    # bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
+    # bindsym XF86MonBrightnessUp exec brightnessctl set 5%+
+    # bindsym XF86AudioPlay exec playerctl play-pause
+    # bindsym XF86AudioNext exec playerctl next
+    # bindsym XF86AudioPrev exec playerctl previous
+    # bindsym XF86Search exec ...
+
+# hide title bar
+# default_border none
+# font pango:monospace 0
+# titlebar_padding 1
+# titlebar_border_thickness 0
+
+#
+# TODO: doesn't work with vim; fix
+#
+    bindsym --release Caps_Lock exec pkill -SIGRTMIN+14 i3blocks
+    bindsym --release Num_Lock  exec pkill -SIGRTMIN+15 i3blocks
+
+#
+# Screen capture
+#
+    set $psf $(xdg-user-dir PICTURES)/ps_$(date +"%Y%m%d%H%M%S").png
+
+    bindsym Print exec grim - | wl-copy
+    bindsym Control+Print exec grim -g "$(slurp)" - | wl-copy
+    bindsym Alt+Print exec grim $psf
+    bindsym Alt+Control+Print exec grim -g "$(slurp)" $psf
+
+#
+# Swaylock
+#
+# don't use
+# bindsym $mod+p exec swaylock --ignore-empty-password --show-failed-attempts --color 1e1e1e
+
+#
+# Swayidle
+#
+# TODO: don't work; understand why
+# exec swayidle -w timeout 900 'swaymsg "output * power off"' resume 'swaymsg "output * power on"'
+
+#
+# make quick note of url from clipboard
+#
+    bindsym $mod+n exec save-clipboard-as-url-note.sh
